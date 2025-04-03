@@ -1749,9 +1749,23 @@ core1_thread = _thread.start_new_thread(core1_thread, ())
 # My vars
 to_print = "CYPHERCON "
 str_idx = 0
-next_update = utime.ticks_ms() + 500
-letter = to_print[str_idx]
-
+scroll_speed = 200
+next_update = utime.ticks_ms() + scroll_speed
+print_width = len(to_print) * 7
+current_letter = 0
+letter_col = 0
+screen_array = [
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0]
+]
 
 while True:
     gc.collect()
@@ -1762,14 +1776,42 @@ while True:
         str_idx = str_idx + 1
         if str_idx >= len(to_print):
             str_idx = 0
-        letter = to_print[str_idx]
-        next_update = utime.ticks_ms() + 500
+            
+        # Fill the frame buffer
+        
+        # Shift the frame left
+        for i in range(9):
+            for j in range(7):
+                screen_array[i][j] = screen_array[i+1][j]
+                
+        if letter_col >= 5:
+            letter_col = 0
+            current_letter = current_letter + 1
+            if current_letter >= len(to_print):
+                current_letter = 0
+            # Add a space between letters
+            for i in range(7):
+                screen_array[9][i] = 0
+        else:    
+                
+            the_letter = to_print[current_letter]
+            for i in range(7):
+                if letters[the_letter][6-i][letter_col] == '*':
+                    screen_array[9][i] = 255
+                else:
+                    screen_array[9][i] = 0
+            letter_col = letter_col + 1
+
+#        for i in range(7):
+#            for j in range(5):
+#                if letters[the_letter][i][j] == '*':
+#                    screen_array[j][i] = 200
+        next_update = utime.ticks_ms() + scroll_speed
     
     overscan_fill(0)
-    for i in range(5):
+    for i in range(10):
         for j in range(7):
-            if letters[letter][j][i] == '*':
-                overscan_set_at(i+1, j+1, 200)
+            overscan_set_at(j, i, screen_array[i][j])
     flip = True
     utime.sleep(.03)
     continue
