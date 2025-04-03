@@ -12,3 +12,5 @@ Badge Shenanigans
 
 # Code
 The code can be found in [main.py](code/main.py)
+
+I asked Claude to add some code comments. Those can be found in [commented-code.py](code/commented-code.py)
